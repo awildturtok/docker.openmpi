@@ -34,7 +34,7 @@ def pprint(str="", end="\n", comm=MPI.COMM_WORLD):
 # Main
 
 size = 10000           # length of vector v
-iter = 2000            # number of iterations to run
+iter = 40            # number of iterations to run
 
 counter = 0
 
@@ -48,14 +48,13 @@ size = comm.size*my_size        # Make sure size is a integer multiple of comm.s
 my_offset = comm.rank*my_size
 
 # This is the complete vector
-vec = np.zeros(size)            # Every element zero...
-vec[0] = 1.0                    #  ... besides vec[0]
+vec = np.random.rand(size)            # Every element zero...
 
 # Create my (local) slice of the matrix
-my_M = np.zeros((my_size, size))
-for i in xrange(my_size):
-    j = (my_offset+i-1) % size
-    my_M[i,j] = 1.0
+my_M = np.random.rand(my_size, size)
+# for i in xrange(my_size):
+#     j = (my_offset+i-1) % size
+#     my_M[i,j] = 1.0
 
 
 while counter < iter:

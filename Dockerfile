@@ -1,8 +1,7 @@
 # Build this image:  docker build -t mpi .
 #
 
-FROM ubuntu:18.04
-# FROM phusion/baseimage
+FROM ubuntu:19.04
 
 MAINTAINER Ole Weidner <ole.weidner@ed.ac.uk>
 
@@ -16,7 +15,8 @@ RUN apt-get update -y && \
     apt-get install -y --no-install-recommends sudo apt-utils && \
     apt-get install -y --no-install-recommends openssh-server \
         python-dev python-numpy python-pip python-virtualenv python-scipy \
-        gcc gfortran libopenmpi-dev openmpi-bin openmpi-common openmpi-doc binutils && \
+        gcc gfortran libopenmpi-dev openmpi-bin openmpi-common openmpi-doc binutils \ 
+        nano ltrace  strace htop iputils-ping tcpdump && \
     apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir /var/run/sshd
@@ -54,9 +54,8 @@ RUN chmod -R 600 ${SSHDIR}* && \
 
 RUN pip install --upgrade pip
 
-USER ${USER}
-RUN  pip install --user -U setuptools \
-    && pip install --user mpi4py
+RUN  pip install  setuptools \
+    && pip install mpi4py
 
 # ------------------------------------------------------------
 # Configure OpenMPI
@@ -68,6 +67,7 @@ RUN rm -fr ${HOME}/.openmpi && mkdir -p ${HOME}/.openmpi
 ADD default-mca-params.conf ${HOME}/.openmpi/mca-params.conf
 RUN chown -R ${USER}:${USER} ${HOME}/.openmpi
 
+
 # ------------------------------------------------------------
 # Copy MPI4PY example scripts
 # ------------------------------------------------------------
@@ -77,5 +77,11 @@ ENV TRIGGER 1
 ADD mpi4py_benchmarks ${HOME}/mpi4py_benchmarks
 RUN chown -R ${USER}:${USER} ${HOME}/mpi4py_benchmarks
 
+ADD scripts /scripts
+RUN chown -R ${USER}:${USER} /scripts
+
+
 EXPOSE 22
+EXPOSE 1024-65535
+
 CMD ["/usr/sbin/sshd", "-D"]

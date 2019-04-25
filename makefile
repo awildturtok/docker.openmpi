@@ -21,16 +21,17 @@ rebuild:
 
 main:
 	# 1 worker node
-	docker-compose scale mpi_head=1 mpi_node=1
-	docker-compose exec --privileged mpi_head mpirun -n 1 python /home/mpirun/mpi4py_benchmarks/all_tests.py
+	docker-compose up --scale mpi_head=1 --scale mpi_node=3 -d
+	docker-compose exec mpi_head sudo -u mpirun mpirun -n 3 -hostfile hosts /scripts/run-on-node.sh 2 "strace -yy" "python /home/mpirun/mpi4py_benchmarks/matrix_vector_product.py"
+	# sudo -u mpirun mpirun -n 3 -hostfile hosts /scripts/run-on-node.sh ltrace "python /home/mpirun/mpi4py_benchmarks/matrix_vector_product.py"
 	docker-compose down
 
 	# 2 worker nodes
-	docker-compose scale mpi_head=1 mpi_node=2
-	docker-compose exec --privileged mpi_head mpirun -n 2 python /home/mpirun/mpi4py_benchmarks/all_tests.py
-	docker-compose down
+	# docker-compose scale mpi_head=1 mpi_node=2
+	# docker-compose exec --privileged mpi_head mpirun -n 2 python /home/mpirun/mpi4py_benchmarks/all_tests.py
+	# docker-compose down
 
-	# ${NNODES} worker nodes
-	docker-compose scale mpi_head=1 mpi_node=${NNODES}
-	docker-compose exec --privileged mpi_head mpirun -n ${NNODES} python /home/mpirun/mpi4py_benchmarks/all_tests.py
-	docker-compose down
+	# # ${NNODES} worker nodes
+	# docker-compose scale mpi_head=1 mpi_node=${NNODES}
+	# docker-compose exec --privileged mpi_head mpirun -n ${NNODES} python /home/mpirun/mpi4py_benchmarks/all_tests.py
+	# docker-compose down

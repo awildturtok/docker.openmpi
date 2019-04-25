@@ -1,35 +1,33 @@
-mpi_head:
+version: "2"
+
+services:
+  mpi_head:
     build: .
     # image: openmpi
     ports: 
       - "22"
     links: 
       - mpi_node
+    networks:
+      - net
 
-mpi_node:
+    security_opt: 
+      - seccomp:unconfined
+
+    command:
+      /usr/sbin/sshd -D
+
+  mpi_node:
     build: .
     # image: openmpi
+    networks:
+      - net
+  
+    security_opt: 
+      - seccomp:unconfined
+    command:
+      /usr/sbin/sshd -D
 
-
-# version: "2"
-
-# services:
-#   mpi_head:
-#     build: .
-#     # image: openmpi
-#     ports: 
-#       - "22"
-#     links: 
-#       - mpi_node
-#     networks:
-#       - net
-
-#   mpi_node:
-#     build: .
-#     # image: openmpi
-#     networks:
-#       - net
-
-# networks:
-#   net:
-#     driver: bridge
+networks:
+  net:
+    driver: bridge
